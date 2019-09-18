@@ -1,0 +1,64 @@
+﻿@model ItemDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="container">
+    <div class="text-left">
+        <a class="btn btn-link" asp-controller="Home" asp-action="Index" asp-route-id="@Model.Id">Back to all items</a>
+    </div>
+    <div class="row">
+        <div class="col-12 col-md-8">
+            <h1 class="d-block d-md-none">@Model.Title</h1>
+            <div>
+                <div class="text-center">
+                    <img src="@Model.PicturePath" data-zoom-image="@Model.PicturePath" alt="">
+                </div>
+            </div>
+
+        </div>
+        <div class="col-12 col-md-4">
+            <h1 class="d-none d-md-block">@Model.Title</h1>
+            <div>
+                <div class="card">
+                    <div class="card-body">
+                        <p>@Model.Description</p>
+                        <h5 class="card-title">Current Bid</h5>
+                        <p class="card-text" id="itemPrice">£@Model.Price</p>
+                        @if (Model.EndTime > DateTime.UtcNow)
+                        {
+                            <p class="card-text">Auction Ends: @Model.EndTime</p>
+                        }
+                        else
+                        {
+                            <p class="card-text">Auction ended</p>
+                        }
+                    </div>
+                </div>
+            </div>
+            @if (User.Identity.IsAuthenticated && Model.EndTime > DateTime.UtcNow)
+            {
+                <div class="form-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">£</span>
+                        <input id="bid-amount" maxlength="12" required type="number" name="bidAmount" class="form-control" placeholder="Amount" min="@Model.Price.ToString("F2")">
+                    </div>
+                    <button class="btn btn-danger btn-lg btn-block mt-1" type="submit" id="button-bid">Bid</button>
+                </div>
+            }
+            else if (!User.Identity.IsAuthenticated)
+            {
+                <a class="btn btn-danger btn-lg btn-block" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@Model.ReturnUrl">Sign In To Bid</a>
+            }
+        </div>
+    </div>
+</div>
+
+<input type="hidden" id="consoleId" value="@Model.Id" />
+
+@section Scripts
+{
+    <script src="~/lib/signalr/signalr.js"></script>
+    <script src="~/js/bid.js"></script>
+}
